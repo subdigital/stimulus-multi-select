@@ -1,9 +1,11 @@
+# stimulus-multi-select
+
 This is a work-in-progress library that uses [Stimulus](https://stimulus.hotwire.dev) to turn a `<select>` element into a type-ahead multiple selection component.
 I created this to replace some older libraries that I was using that had jQuery and/or bootstrap dependencies.
 
-This library is intended to work well with [Tailwind CSS](https://tailwindcss.com)
+This library is intended to work well with [Tailwind CSS](https://tailwindcss.com), but ultimately you are in control of the styling.
 
-Requires:
+Dependencies:
 
 - `stimulus 2.0`
 
@@ -14,11 +16,13 @@ Requires:
 - Click to remove selected items
 - Backed by a hidden HTML `select` tag
 
+![demo](example/demo.gif)
+
 ## How to use
 
 Add the package to your `package.json`:
 
-```
+```bash
 yarn add stimulus-multi-select
 ```
 
@@ -72,7 +76,7 @@ This controller is probably lacking in accessibility. PRs welcome.
 
 This utilizes `webpack-dev-server` to bundle and live-reload an example playground. To run it:
 
-```
+```bash
 npm run playground
 ```
 
@@ -81,14 +85,12 @@ npm run playground
 - `data-multi-select-result-class` - a list of classes that will be applied to the `<li>` results
 - `data-multi-select-result-selected-class` - a list of classes that will be applied to `<li>` results that are selected via keyboard. Recommended to add similar hover styles to the above class to match.
 - `data-multi-select-item-active-class` - This is only used if you are _not_ using the `<template>` to define the selected item look. This class will be applied to the generated `<span>` tag.
+- `data-multi-select-allow-duplicates-value` - (default `"false"`) - Set this to true to allow the same option to be selected multiple times.
 
 ## Feedback?
 
 I'm admittedly not well versed in creating javascript packages. If you have ideas for improvement, feel free to open a PR.
 
-
 ## License
 
 This library is released under the MIT license.
-
-
