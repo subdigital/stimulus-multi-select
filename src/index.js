@@ -5,7 +5,8 @@ class MultiSelectController extends Controller {
 
     static values = {
         selectedIndex: Number,
-        isShowing: Boolean
+        isShowing: Boolean,
+        allowDuplicates: Boolean
     }
 
     initialize() {
@@ -26,7 +27,7 @@ class MultiSelectController extends Controller {
         this.inputTarget.addEventListener('input', (e) => this.handleInputChange(e))
         this.resultsTarget.addEventListener('click', (e) => this.resultsClick(e))
 
-        this.options.filter(o => o.selected).forEach(o => this.selectItem(o))
+        this.options.filter(o => o.selected).forEach(o => this.selectItem(o, true))
     }
 
     get options() {
@@ -76,7 +77,11 @@ class MultiSelectController extends Controller {
         }
     }
 
-    selectItem(item) {
+    selectItem(item, force) {
+        if (!this.allowDuplicatesValue && item.selected && !force) {
+            return
+        }
+
         const itemTag = this.createSelectedItemTag(item)
         this.activeItemsTarget.appendChild(itemTag)
         item.selected = true
@@ -108,6 +113,7 @@ class MultiSelectController extends Controller {
             removeButton.innerText = "x"
             removeButton.classList.add("multi-select-item-remove")
             removeButton.addEventListener("click", (e) => {
+                item.selected = false
                 this.activeItemsTarget.removeChild(itemSpan)
             })
             itemSpan.appendChild(removeButton)
@@ -131,15 +137,21 @@ class MultiSelectController extends Controller {
     }
 
     filterResults(term) {
+        let opts = this.options
+        if (!this.allowDuplicatesValue) {
+            opts = opts.filter(o => !o.selected)
+        }
+
         if (term === "") {
-            return this.options
+            return opts
         }
 
         let normalize = (s) => {
             return s.toLowerCase()
                 .replace(/['"]/, "")
         }
-        return this.options.filter(o => {
+
+        return opts.filter(o => {
             return normalize(o.text).indexOf(normalize(term)) > -1
         })
     }
@@ -192,7 +204,6 @@ class MultiSelectController extends Controller {
     }
 
     selectedIndexValueChanged() {
-        console.log("index changed:", this.selectedIndexValue)
         let lis = this.resultsTarget.querySelectorAll("li")
         lis.forEach(li => li.classList.remove(this.resultSelectedClass))
         if (this.selectedIndexValue >= 0 && this.selectedIndexValue < lis.length) {
