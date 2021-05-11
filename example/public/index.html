@@ -34,10 +34,11 @@
     }
 
     .multi-select-result {
-      padding: 2px 6px;
+      padding: 4px 10px;
     }
 
-    .multi-select-result--selected {
+    .multi-select-result:hover, .multi-select-result--selected {
+      cursor: default;
       background-color: blue;
       color: white;
     }
@@ -49,6 +50,54 @@
     .relative {
       position: relative;
     }
+
+    .box h3 {
+      font-weight: medium;
+      font-size: 16px;
+    }
+
+    .box input {
+      font-size: 18px;
+      border: none;
+    }
+
+    .w-3 {
+      width: 10px;
+    }
+
+    .h-3 {
+      height: 10px;
+    }
+
+    .text-white {
+      color: #fff;
+    }
+
+    .item--active {
+      background-color: #ddd;
+      color: #555;
+      padding: 2px 4px;
+      font-size: x-small;
+      border-radius: 3px;
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-right: 2px;
+    }
+
+    .item--active button {
+      border: none;
+      background-color: transparent;
+      padding: 0;
+      margin: 0;
+      margin-left: 4px;
+    }
+
+    .field {
+      border: solid 1px #ddd;
+      padding: 3px 4px;
+      border-radius: 6px;
+    }
   </style>
 
   <script src="bundle.js" async></script>
@@ -56,15 +105,36 @@
 <body>
 
   <div class="box">
-    test
+    <h3>Type a superhero</h3>
 
-    <div data-controller="multi-select" class="relative">
-      <input data-multi-select-target="input" type="text">
-      <select data-multi-select-target="select">
-        <option value="superman">Superman</option>
+    <div
+      data-controller="multi-select"
+      data-multi-select-result-class="multi-select-result"
+      data-multi-select-result-selected-class="multi-select-result--selected"
+      data-multi-select-item-active-class="item--active"
+      class="relative">
+      <div data-multi-select-target="field" class="field">
+        <div data-multi-select-target="activeItems">
+          <template>
+            <span class="item--active">
+              <span>TEXT HERE</span>
+              <button>
+                <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </span>
+            </span>
+          </template>
+        </div>
+        <input data-multi-select-target="input" type="text">
+      </div>
+      <select multiple data-multi-select-target="select" style="height: 250px;">
+        <option></option>
+        <option selected value="superman">Superman</option>
         <option value="spider">Spider-Man</option>
         <option value="batman">Batman</option>
-        <option value="iron-man">Iron Man</option>
+        <option selected value="iron-man">Iron Man</option>
+        <option value="wonder-woman">Wonder Woman</option>
+        <option value="the flash">The Flash</option>
+        <option value="storm">Storm</option>
       </select>
       <ul class="hidden multi-select-results" data-multi-select-target="results">
       </ul>

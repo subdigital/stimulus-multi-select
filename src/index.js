@@ -1,8 +1,8 @@
 import {Controller} from "stimulus"
-
-console.log("Importing...")
 class MultiSelectController extends Controller {
-    static targets = ["select", "input", "results"]
+    static targets = ["select", "input", "results", "activeItems", "field"]
+    static classes = ["result", "resultSelected", "itemActive"]
+
     static values = {
         selectedIndex: Number,
         isShowing: Boolean
@@ -13,46 +13,52 @@ class MultiSelectController extends Controller {
 
     connect() {
         window.multi = this
+        this.selectedIndexValue = -1
 
         this.selectTarget.classList.add("hidden")
+        this.resultsTarget.tabIndex = 0
 
         this.inputTarget.setAttribute("autocomplete", "off")
         this.inputTarget.setAttribute("spellcheck", "false")
 
         this.inputTarget.addEventListener('keydown', (e) => this.handleKey(e))
+        this.resultsTarget.addEventListener('keydown', (e) => this.handleKey(e))
         this.inputTarget.addEventListener('input', (e) => this.handleInputChange(e))
         this.resultsTarget.addEventListener('click', (e) => this.resultsClick(e))
+
+        this.options.filter(o => o.selected).forEach(o => this.selectItem(o))
     }
 
     get options() {
-        return Array.apply(null, this.selectTarget.options)
-    }
-
-    get listItemClass() {
-        return (this.resultsTarget.dataset.multiSelectListItemClass || "multi-select-result").split(/\s+/)
-    }
-
-    get listItemSelectedClass() {
-        return (this.resultsTarget.dataset.multiSelectListItemSelectedClass || "multi-select-result--selected").split(/\s+/)
+        return Array.apply(null, this.selectTarget.options).filter(o => o.value)
     }
 
     get resultsItemCount() {
         return this.resultsTarget.querySelectorAll("li").length
     }
 
+    get filteredResults() {
+        const results = this.filterResults(this.inputTarget.value)
+        return results
+    }
+
     handleKey(e) {
         switch (e.key) {
             case "Escape":
                 this.isShowingValue = false
+                this.selectedIndexValue = -1
                 break
 
             case "ArrowDown": 
-                if (this.isShowingValue && this.selectedIndexValue < this.resultsItemCount - 1) {
-                    this.selectedIndexValue++
-                } else if (!this.isShowingValue) {
-                    this.showResults(this.options)
+                if (this.isShowingValue) {
+                    if (this.selectedIndexValue < this.resultsItemCount - 1) {
+                        this.selectedIndexValue++
+                    }
+                } else {
+                    this.showResults(this.filteredResults)
                     this.selectedIndexValue = 0
                 }
+
                 break
 
             case "ArrowUp": 
@@ -61,25 +67,74 @@ class MultiSelectController extends Controller {
                 }
                 break
 
-            case "Tab": break
+            case "Enter":
+                if (this.selectedIndexValue > -1 && this.selectedIndexValue < this.resultsItemCount) {
+                    const item = this.filteredResults[this.selectedIndexValue]
+                    this.selectItem(item)
+                }
+                break
+        }
+    }
 
-            case "Enter": break
+    selectItem(item) {
+        const itemTag = this.createSelectedItemTag(item)
+        this.activeItemsTarget.appendChild(itemTag)
+        item.selected = true
+
+        this.selectedIndex = -1
+        this.isShowingValue = false
+        this.inputTarget.value = ""
+    }
+
+    createSelectedItemTag(item) {
+        let template = this.activeItemsTarget.querySelector("template")
+        if (template) {
+            let itemSpan = template.content.cloneNode(true).children[0]
+            itemSpan.querySelector("span").innerText = item.text
+            itemSpan.querySelector("button").addEventListener("click", (e) => {
+                item.selected = false
+                this.activeItemsTarget.removeChild(itemSpan)
+            })
+            return itemSpan
+        } else {
+            let itemSpan = document.createElement("span")
+            itemSpan.classList.add(this.itemActiveClass)
+
+            let itemText = document.createElement("span")
+            itemText.innerText = item.text
+            itemSpan.appendChild(itemText)
+
+            let removeButton = document.createElement("span")
+            removeButton.innerText = "x"
+            removeButton.classList.add("multi-select-item-remove")
+            removeButton.addEventListener("click", (e) => {
+                this.activeItemsTarget.removeChild(itemSpan)
+            })
+            itemSpan.appendChild(removeButton)
+
+            return itemSpan
         }
     }
 
     handleInputChange(e) {
-        console.log(this.inputTarget.value)
-        let results = this.filterResults(this.inputTarget.value)
-        this.showResults(results)
+        this.showResults(this.filteredResults)
     }
 
     resultsClick(e) {
-        console.log("results click, target: ", e.target)
-        const selected = e.target.closest('[role="option"]')
-        console.log("selected", selected)
+        const selectedListItem = e.target.closest('[role="option"]')
+        const option = this.options.filter(o => o.value == selectedListItem.dataset.value)[0]
+        if (option) {
+            this.selectItem(option)
+        } else {
+            console.warn("Couldn't find option with value: ", selectedListItem.dataset.value)
+        }
     }
 
     filterResults(term) {
+        if (term === "") {
+            return this.options
+        }
+
         let normalize = (s) => {
             return s.toLowerCase()
                 .replace(/['"]/, "")
@@ -92,7 +147,7 @@ class MultiSelectController extends Controller {
     showResults(results) {
         this.removeChildren(this.resultsTarget)
         let index = 0
-        let resultItems = results.map(r => this.createResultItem(r.text, index++))
+        let resultItems = results.map(r => this.createResultItem(r.text, r.value, index++))
         if (resultItems.length > 0) {
             this.isShowingValue = true
             resultItems.slice(0, 10).forEach(item => this.resultsTarget.appendChild(item))
@@ -103,17 +158,20 @@ class MultiSelectController extends Controller {
     }
 
     createLoadMoreItem(index) {
-        let li = this.createResultItem("More…", index)
+        let li = this.createResultItem("More…", null, index)
         li.dataset.loadMore = true
         return li
     }
 
-    createResultItem(result, index) {
+    createResultItem(result, value, index) {
         let li = document.createElement("li")
         li.role = "option"
+        if (value) {
+            li.dataset.value = value
+        }
         li.innerText = result
         li.dataset.index = index
-        li.classList.add(...this.listItemClass)
+        li.classList.add(this.resultClass)
         return li
     }
     
@@ -136,9 +194,9 @@ class MultiSelectController extends Controller {
     selectedIndexValueChanged() {
         console.log("index changed:", this.selectedIndexValue)
         let lis = this.resultsTarget.querySelectorAll("li")
-        lis.forEach(li => li.classList.remove(...this.listItemSelectedClass))
+        lis.forEach(li => li.classList.remove(this.resultSelectedClass))
         if (this.selectedIndexValue >= 0 && this.selectedIndexValue < lis.length) {
-            lis[this.selectedIndexValue].classList.add(...this.listItemSelectedClass)
+            lis[this.selectedIndexValue].classList.add(this.resultSelectedClass)
         } else if (this.selectedIndexValue > 0) {
             // stay at last element
             this.selectedIndexValue = lis.length - 1
