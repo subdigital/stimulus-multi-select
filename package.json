@@ -4,7 +4,6 @@
   "description": "A stimulus controller to change a select tag into a type-ahead selection component",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --watch",
     "build": "webpack --env dev && webpack --env build",
     "playground": "webpack serve --mode development --open --config example/webpack.config.js --hot"
   },
