@@ -6,7 +6,8 @@ class MultiSelectController extends Controller {
     static values = {
         selectedIndex: Number,
         isShowing: Boolean,
-        allowDuplicates: Boolean
+        allowDuplicates: Boolean,
+        allowCreatingNewEntries: Boolean
     }
 
     initialize() {
@@ -72,6 +73,11 @@ class MultiSelectController extends Controller {
                 if (this.selectedIndexValue > -1 && this.selectedIndexValue < this.resultsItemCount) {
                     const item = this.filteredResults[this.selectedIndexValue]
                     this.selectItem(item)
+                } else if (this.allowCreatingNewEntriesValue) {
+                    let trimmedInput = this.inputTarget.value.trim()
+                    if (trimmedInput.length && !this.findOption(trimmedInput)) {
+                        this.createNewEntry(trimmedInput)
+                    }
                 }
                 break
         }
@@ -82,13 +88,19 @@ class MultiSelectController extends Controller {
             return
         }
 
-        const itemTag = this.createSelectedItemTag(item)
+        let itemTag = this.createSelectedItemTag(item)
         this.activeItemsTarget.appendChild(itemTag)
         item.selected = true
 
         this.selectedIndex = -1
         this.isShowingValue = false
         this.inputTarget.value = ""
+    }
+
+    createNewEntry(text) {
+        let opt = new Option(text, text)
+        this.selectTarget.add(opt, null)
+        this.selectItem(opt)
     }
 
     createSelectedItemTag(item) {
@@ -126,9 +138,13 @@ class MultiSelectController extends Controller {
         this.showResults(this.filteredResults)
     }
 
+    findOption(value) {
+        return this.options.filter(o => o.value == value)[0]
+    }
+
     resultsClick(e) {
         const selectedListItem = e.target.closest('[role="option"]')
-        const option = this.options.filter(o => o.value == selectedListItem.dataset.value)[0]
+        const option = this.findOption(selectedListItem.dataset.value)
         if (option) {
             this.selectItem(option)
         } else {

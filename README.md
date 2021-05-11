@@ -15,6 +15,7 @@ Dependencies:
 - Keyboard support (up/down, enter to select, escape to close)
 - Click to remove selected items
 - Backed by a hidden HTML `select` tag
+- (optionally) create new items
 
 ![demo](example/demo.gif)
 
@@ -86,6 +87,7 @@ npm run playground
 - `data-multi-select-result-selected-class` - a list of classes that will be applied to `<li>` results that are selected via keyboard. Recommended to add similar hover styles to the above class to match.
 - `data-multi-select-item-active-class` - This is only used if you are _not_ using the `<template>` to define the selected item look. This class will be applied to the generated `<span>` tag.
 - `data-multi-select-allow-duplicates-value` - (default `"false"`) - Set this to true to allow the same option to be selected multiple times.
+- `data-multi-select-allow-creating-new-entries-value` - (default `"false"`) - Set this to true to allow creating arbitrary entries.
 
 ## Feedback?
 
