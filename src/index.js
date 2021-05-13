@@ -115,7 +115,8 @@ class MultiSelectController extends Controller {
             return itemSpan
         } else {
             let itemSpan = document.createElement("span")
-            itemSpan.classList.add(this.itemActiveClass)
+            const itemActiveClass = this.hasItemActiveClass ? this.itemActiveClass : "multi-select-item--active"
+            itemSpan.classList.add(...(itemActiveClass.split(/\s+/)))
 
             let itemText = document.createElement("span")
             itemText.innerText = item.text
@@ -199,7 +200,8 @@ class MultiSelectController extends Controller {
         }
         li.innerText = result
         li.dataset.index = index
-        li.classList.add(this.resultClass)
+        const resultClass = this.hasResultClass ? this.resultClass : "multi-select-result"
+        li.classList.add(...(resultClass.split(/\s+/)))
         return li
     }
     
@@ -221,15 +223,15 @@ class MultiSelectController extends Controller {
 
     selectedIndexValueChanged() {
         let lis = this.resultsTarget.querySelectorAll("li")
-        lis.forEach(li => li.classList.remove(this.resultSelectedClass))
+        const resultSelectedClass = (this.hasResultSelectedClass ? this.resultSelectedClass : "multi-select-result--selected").split(/\s+/)
+        lis.forEach(li => li.classList.remove(...resultSelectedClass))
         if (this.selectedIndexValue >= 0 && this.selectedIndexValue < lis.length) {
-            lis[this.selectedIndexValue].classList.add(this.resultSelectedClass)
+            lis[this.selectedIndexValue].classList.add(...resultSelectedClass)
         } else if (this.selectedIndexValue > 0) {
             // stay at last element
             this.selectedIndexValue = lis.length - 1
         }
     }
 }
-
 
 export default MultiSelectController
