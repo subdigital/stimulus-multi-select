@@ -27,6 +27,26 @@ Add the package to your `package.json`:
 yarn add stimulus-multi-select
 ```
 
+Register the controller:
+
+```javascript
+// wherever you are setting up your Stimulus controllers, i.e. application.js
+import { Application } from "stimulus"
+import { definitionsFromContext } from "stimulus/webpack-helpers"
+import MultiSelectController from "stimulus-multi-select"
+
+const application = Application.start()
+
+// you probably have something like this where you register controllers automatically
+const context = require.context('../controllers', true, /\.js$/)
+application.load(definitionsFromContext(context))
+
+// add this to register it manually
+application.register("multi-select", MultiSelectController)
+```
+
+You can also create your own file in `controllers` and register it automatically, for instance if youw ant to subclass and override some behavior.
+
 Attach the controller to an element. It requires some structure to be present:
 
 ```html
@@ -68,6 +88,11 @@ Some important things to note:
 
 - the `<template>` is not required but recommended to represent the selected items. Otherwise the library will generate a simple `<span>` for you but will be more difficult to style.
 - The `<select>` tag is where you'll add your source data and any initial selections. A blank row is _required_. All other rows are expected to have a `value` or they will be ignored when filtering.
+- This library relies on toggling a `hidden` CSS class to control visibility. If you're already using Tailwind CSS this will just work. If not you'll need to define this somewhere:
+
+```css
+.hidden { display: none; }
+```
 
 ## Things not done
 
