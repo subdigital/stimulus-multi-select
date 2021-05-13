@@ -2,9 +2,12 @@
   "name": "stimulus-multi-select",
   "version": "0.1.0",
   "description": "A stimulus controller to change a select tag into a type-ahead selection component",
-  "main": "index.js",
+  "exports": "./dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/stimulus-multi-select.module.js",
+  "unpkg": "./dist/stimulus-multi-select.umd.js",
   "scripts": {
-    "build": "webpack --env dev && webpack --env build",
+    "build": "microbundle",
     "playground": "webpack serve --mode development --open --config example/webpack.config.js --hot"
   },
   "author": "Ben Scheirman",
@@ -14,8 +17,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
     "@babel/preset-env": "^7.14.1",
     "babel-loader": "^8.2.2",
+    "microbundle": "^0.13.0",
     "webpack": "^5.37.0",
     "webpack-cli": "^4.7.0",
     "webpack-dev-server": "^3.11.2"
