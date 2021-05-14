@@ -10,11 +10,7 @@ class MultiSelectController extends Controller {
         allowCreatingNewEntries: Boolean
     }
 
-    initialize() {
-    }
-
     connect() {
-        window.multi = this
         this.selectedIndexValue = -1
 
         this.selectTarget.classList.add("hidden")
@@ -70,6 +66,7 @@ class MultiSelectController extends Controller {
                 break
 
             case "Enter":
+                e.preventDefault()
                 if (this.selectedIndexValue > -1 && this.selectedIndexValue < this.resultsItemCount) {
                     const item = this.filteredResults[this.selectedIndexValue]
                     this.selectItem(item)
@@ -91,7 +88,6 @@ class MultiSelectController extends Controller {
         let itemTag = this.createSelectedItemTag(item)
         this.activeItemsTarget.appendChild(itemTag)
         item.selected = true
-
         this.selectedIndex = -1
         this.isShowingValue = false
         this.inputTarget.value = ""
