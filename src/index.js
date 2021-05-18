@@ -132,6 +132,7 @@ class MultiSelectController extends Controller {
     }
 
     handleInputChange(e) {
+        this.selectedIndexValue = -1
         this.showResults(this.filteredResults)
     }
 
