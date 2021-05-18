@@ -48,6 +48,7 @@ class MultiSelectController extends Controller {
                 break
 
             case "ArrowDown": 
+                e.preventDefault()
                 if (this.isShowingValue) {
                     if (this.selectedIndexValue < this.resultsItemCount - 1) {
                         this.selectedIndexValue++
@@ -61,6 +62,7 @@ class MultiSelectController extends Controller {
 
             case "ArrowUp": 
                 if (this.isShowingValue && this.selectedIndexValue > 0) {
+                    e.preventDefault()
                     this.selectedIndexValue--
                 }
                 break
