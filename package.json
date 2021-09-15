@@ -1,6 +1,6 @@
 {
   "name": "stimulus-multi-select",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A stimulus controller to change a select tag into a type-ahead selection component",
   "exports": "./dist/index.js",
   "main": "./dist/index.js",

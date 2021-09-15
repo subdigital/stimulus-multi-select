@@ -52,6 +52,7 @@ Attach the controller to an element. It requires some structure to be present:
 ```html
   <div
       data-controller="multi-select"
+      data-multi-select-max-results-value="10"
       data-multi-select-result-class="multi-select-result"
       data-multi-select-result-selected-class="multi-select-result--selected"
       data-multi-select-item-active-class="item--active"
@@ -84,7 +85,7 @@ Attach the controller to an element. It requires some structure to be present:
     </div>
 ```
 
-Some important things to note:
+### Some important things to note
 
 - the `<template>` is not required but recommended to represent the selected items. Otherwise the library will generate a simple `<span>` for you but will be more difficult to style.
 - The `<select>` tag is where you'll add your source data and any initial selections. A blank row is _required_. All other rows are expected to have a `value` or they will be ignored when filtering.
@@ -93,6 +94,10 @@ Some important things to note:
 ```css
 .hidden { display: none; }
 ```
+
+### Controlling the page size
+
+By default the results will be limited to 10 results, with a "More..." item that will bring in more results. You can customize this with the `data-multi-select-max-results-value` and pass a different number.
 
 ## Things not done
 

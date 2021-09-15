@@ -7,11 +7,13 @@ class MultiSelectController extends Controller {
         selectedIndex: Number,
         isShowing: Boolean,
         allowDuplicates: Boolean,
-        allowCreatingNewEntries: Boolean
+        allowCreatingNewEntries: Boolean,
+        maxResults: Number
     }
 
     connect() {
         this.selectedIndexValue = -1
+        this.maxResultsValue = this.maxResultsValue || 10
 
         this.selectTarget.classList.add("hidden")
         this.resultsTarget.tabIndex = 0
@@ -147,6 +149,10 @@ class MultiSelectController extends Controller {
         const option = this.findOption(selectedListItem.dataset.value)
         if (option) {
             this.selectItem(option)
+        } else if (selectedListItem.dataset && selectedListItem.dataset.loadMore) {
+            // load more
+            const maxResults = selectedListItem.dataset.index;
+            this.showResults(this.filteredResults, maxResults);
         } else {
             console.warn("Couldn't find option with value: ", selectedListItem.dataset.value)
         }
@@ -172,15 +178,19 @@ class MultiSelectController extends Controller {
         })
     }
 
-    showResults(results) {
+    showResults(results, max = null) {
+        if (max === null) {
+            max = this.maxResultsValue;
+        }
+
         this.removeChildren(this.resultsTarget)
         let index = 0
         let resultItems = results.map(r => this.createResultItem(r.text, r.value, index++))
         if (resultItems.length > 0) {
             this.isShowingValue = true
-            resultItems.slice(0, 10).forEach(item => this.resultsTarget.appendChild(item))
-            if (resultItems.length > 10) {
-                this.resultsTarget.appendChild(this.createLoadMoreItem(10))
+            resultItems.slice(0, max).forEach(item => this.resultsTarget.appendChild(item))
+            if (resultItems.length > max) {
+                this.resultsTarget.appendChild(this.createLoadMoreItem(max + this.maxResultsValue))
             }
         }
     }
